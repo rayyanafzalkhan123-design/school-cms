@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
-<head><title>Dashboard</title></head>
+<head><title>Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
     <h2>Student Management</h2>
 
@@ -12,11 +14,13 @@
     <input id="section" placeholder="Section">
     <input id="gmail" placeholder="Gmail">
     <input id="major_subject" placeholder="Major Subject">
+    <br>
     <button onclick="addStudent()">Add New Student</button>
     <button onclick="saveChanges()">Save Changes</button>
 
     <h3>Find a Student</h3>
     <input id="search_roll_no" placeholder="Roll No">
+    <br>
     <button onclick="searchStudent()">Enter R.No to Search</button>
     <button onclick="loadForEdit()">Enter R.No to Update</button>
     <button onclick="deleteStudent()">Enter R.No to Delete</button>
@@ -38,11 +42,13 @@
     <input id="t_gender" placeholder="Gender">
     <input id="t_subject" placeholder="Subject">
     <input id="t_specialization" placeholder="Specialization">
+    <br>
     <button onclick="addTeacher()">Add New Teacher</button>
     <button onclick="saveTeacherChanges()">Save Changes</button>
 
     <h3>Find a Teacher</h3>
     <input id="search_t_id" placeholder="ID">
+    <br>
     <button onclick="searchTeacher()">Enter ID to Search</button>
     <button onclick="loadTeacherForEdit()">Enter ID to Update</button>
     <button onclick="deleteTeacher()">Enter ID to Delete</button>
@@ -63,11 +69,13 @@
     <input id="c_capacity" placeholder="Capacity" type="number">
     <input id="c_department" placeholder="Department">
     <input id="c_section" placeholder="Section">
+    <br>
     <button onclick="addClassroom()">Add New Classroom</button>
     <button onclick="saveClassroomChanges()">Save Changes</button>
 
     <h3>Find a Classroom</h3>
     <input id="search_c_number" placeholder="Classroom Number">
+    <br>
     <button onclick="searchClassroom()">Enter No. to Search</button>
     <button onclick="loadClassroomForEdit()">Enter No. to Update</button>
     <button onclick="deleteClassroom()">Enter No. to Delete</button>
@@ -91,11 +99,13 @@
     <input id="tt_section" placeholder="Section">
     <input id="tt_class" placeholder="Assigned Class">
     <input id="tt_teacher" placeholder="Assigned Teacher ID">
+    <br>
     <button onclick="addTimetable()">Add New Entry</button>
     <button onclick="saveTimetableChanges()">Save Changes</button>
 
     <h3>Find an Entry</h3>
     <input id="search_tt_id" placeholder="ID">
+    <br>
     <button onclick="searchTimetable()">Enter ID to Search</button>
     <button onclick="loadTimetableForEdit()">Enter ID to Update</button>
     <button onclick="deleteTimetable()">Enter ID to Delete</button>
@@ -138,6 +148,7 @@
             const res = await fetch(`${API}/students/${rollNo}`);
             const data = await res.json();
             document.getElementById("searchResult").innerText = JSON.stringify(data);
+            document.getElementById("search_roll_no").value = "";
         }
 
         async function loadForEdit() {
@@ -177,6 +188,7 @@
         async function deleteStudent() {
             const rollNo = document.getElementById("search_roll_no").value;
             await fetch(`${API}/students/${rollNo}`, { method: "DELETE" });
+            document.getElementById("search_roll_no").value = "";
             loadStudents();
         }
 
@@ -232,6 +244,7 @@
             const res = await fetch(`${API}/teachers/${id}`);
             const data = await res.json();
             document.getElementById("teacherResult").innerText = JSON.stringify(data);
+            document.getElementById("search_t_id").value = "";
         }
 
         async function loadTeacherForEdit() {
@@ -267,6 +280,7 @@
         async function deleteTeacher() {
             const id = document.getElementById("search_t_id").value;
             await fetch(`${API}/teachers/${id}`, { method: "DELETE" });
+            document.getElementById("search_t_id").value = "";
             loadTeachers();
         }
 
@@ -321,6 +335,7 @@
             const res = await fetch(`${API}/classrooms/${num}`);
             const data = await res.json();
             document.getElementById("classroomResult").innerText = JSON.stringify(data);
+            document.getElementById("search_c_number").value = "";
         }
 
         async function loadClassroomForEdit() {
@@ -354,6 +369,7 @@
         async function deleteClassroom() {
             const num = document.getElementById("search_c_number").value;
             await fetch(`${API}/classrooms/${num}`, { method: "DELETE" });
+            document.getElementById("search_c_number").value = "";
             loadClassrooms();
         }
 
@@ -410,6 +426,7 @@
             const res = await fetch(`${API}/timetable/${id}`);
             const data = await res.json();
             document.getElementById("timetableResult").innerText = JSON.stringify(data);
+            document.getElementById("search_tt_id").value = "";
         }
 
         async function loadTimetableForEdit() {
@@ -449,6 +466,7 @@
         async function deleteTimetable() {
             const id = document.getElementById("search_tt_id").value;
             await fetch(`${API}/timetable/${id}`, { method: "DELETE" });
+            document.getElementById("search_tt_id").value = "";
             loadTimetable();
         }
 
