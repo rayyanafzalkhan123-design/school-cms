@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+</head>
+<body>
+    <h2>Admin Login</h2>
+    <input type="text" id="username" placeholder="Username"><br><br>
+    <input type="password" id="password" placeholder="Password"><br><br>
+    <button onclick="login()">Login</button>
+    <p id="message"></p>
+
+    <script>
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch(`http://127.0.0.1:8000/login?username=${username}&password=${password}`, {
+                method: "POST"
+            });
+            const data = await response.json();
+
+            if (data.message === "Login successful") {
+                window.location.href = "dashboard.html";
+            } else {
+                document.getElementById("message").innerText = data.message;
+            }
+        }
+
+        document.getElementById("username").addEventListener("keydown", e => {
+            if (e.key === "Enter") login();
+        });
+        document.getElementById("password").addEventListener("keydown", e => {
+            if (e.key === "Enter") login();
+        });
+    </script>
+</body>
+</html>

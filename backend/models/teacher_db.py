@@ -36,3 +36,14 @@ def search_teacher(id):
     cur.close()
     conn.close()
     return row
+
+def update_teacher(id, name, gender, subject, specialization):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE teachers SET name=%s, gender=%s, subject=%s, specialization=%s WHERE id=%s",
+        (name, gender, subject, specialization, id)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()

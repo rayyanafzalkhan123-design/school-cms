@@ -36,3 +36,14 @@ def search_student(roll_no):
     cur.close()
     conn.close()
     return row
+
+def update_student(roll_no, name, age, gender, section, gmail, major_subject):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "UPDATE students SET name=%s, age=%s, gender=%s, section=%s, gmail=%s, major_subject=%s WHERE roll_no=%s",
+        (name, age, gender, section, gmail, major_subject, roll_no)
+    )
+    conn.commit()
+    cur.close()
+    conn.close()

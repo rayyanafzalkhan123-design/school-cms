@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html>
+<head><title>Dashboard</title></head>
+<body>
+    <h2>Student Management</h2>
+
+    <h3>Add / Edit Student</h3>
+    <input id="roll_no" placeholder="Roll No">
+    <input id="name" placeholder="Name">
+    <input id="age" placeholder="Age" type="number">
+    <input id="gender" placeholder="Gender">
+    <input id="section" placeholder="Section">
+    <input id="gmail" placeholder="Gmail">
+    <input id="major_subject" placeholder="Major Subject">
+    <button onclick="addStudent()">Add New Student</button>
+    <button onclick="saveChanges()">Save Changes</button>
+
+    <h3>Find a Student</h3>
+    <input id="search_roll_no" placeholder="Roll No">
+    <button onclick="searchStudent()">Enter R.No to Search</button>
+    <button onclick="loadForEdit()">Enter R.No to Update</button>
+    <button onclick="deleteStudent()">Enter R.No to Delete</button>
+    <p id="searchResult"></p>
+
+    <h3>All Students</h3>
+    <button onclick="loadStudents()">Refresh List</button>
+    <table border="1" id="studentTable">
+        <tr><th>Roll No</th><th>Name</th><th>Age</th><th>Gender</th><th>Section</th><th>Gmail</th><th>Major</th></tr>
+    </table>
+
+    <hr>
+
+    <h2>Teacher Management</h2>
+
+    <h3>Add / Edit Teacher</h3>
+    <input id="t_id" placeholder="ID">
+    <input id="t_name" placeholder="Name">
+    <input id="t_gender" placeholder="Gender">
+    <input id="t_subject" placeholder="Subject">
+    <input id="t_specialization" placeholder="Specialization">
+    <button onclick="addTeacher()">Add New Teacher</button>
+    <button onclick="saveTeacherChanges()">Save Changes</button>
+
+    <h3>Find a Teacher</h3>
+    <input id="search_t_id" placeholder="ID">
+    <button onclick="searchTeacher()">Enter ID to Search</button>
+    <button onclick="loadTeacherForEdit()">Enter ID to Update</button>
+    <button onclick="deleteTeacher()">Enter ID to Delete</button>
+    <p id="teacherResult"></p>
+
+    <h3>All Teachers</h3>
+    <button onclick="loadTeachers()">Refresh List</button>
+    <table border="1" id="teacherTable">
+        <tr><th>ID</th><th>Name</th><th>Gender</th><th>Subject</th><th>Specialization</th></tr>
+    </table>
+
+    <hr>
+
+    <h2>Classroom Management</h2>
+
+    <h3>Add / Edit Classroom</h3>
+    <input id="c_number" placeholder="Classroom Number">
+    <input id="c_capacity" placeholder="Capacity" type="number">
+    <input id="c_department" placeholder="Department">
+    <input id="c_section" placeholder="Section">
+    <button onclick="addClassroom()">Add New Classroom</button>
+    <button onclick="saveClassroomChanges()">Save Changes</button>
+
+    <h3>Find a Classroom</h3>
+    <input id="search_c_number" placeholder="Classroom Number">
+    <button onclick="searchClassroom()">Enter No. to Search</button>
+    <button onclick="loadClassroomForEdit()">Enter No. to Update</button>
+    <button onclick="deleteClassroom()">Enter No. to Delete</button>
+    <p id="classroomResult"></p>
+
+    <h3>All Classrooms</h3>
+    <button onclick="loadClassrooms()">Refresh List</button>
+    <table border="1" id="classroomTable">
+        <tr><th>Number</th><th>Capacity</th><th>Department</th><th>Section</th></tr>
+    </table>
+
+    <hr>
+
+    <h2>Timetable Management</h2>
+
+    <h3>Add / Edit Timetable Entry</h3>
+    <input id="tt_id" placeholder="ID (leave blank when adding)">
+    <input id="tt_day" placeholder="Day">
+    <input id="tt_time" placeholder="Time">
+    <input id="tt_classroom" placeholder="Classroom Number">
+    <input id="tt_section" placeholder="Section">
+    <input id="tt_class" placeholder="Assigned Class">
+    <input id="tt_teacher" placeholder="Assigned Teacher ID">
+    <button onclick="addTimetable()">Add New Entry</button>
+    <button onclick="saveTimetableChanges()">Save Changes</button>
+
+    <h3>Find an Entry</h3>
+    <input id="search_tt_id" placeholder="ID">
+    <button onclick="searchTimetable()">Enter ID to Search</button>
+    <button onclick="loadTimetableForEdit()">Enter ID to Update</button>
+    <button onclick="deleteTimetable()">Enter ID to Delete</button>
+    <p id="timetableResult"></p>
+
+    <h3>Timetable:</h3>
+    <button onclick="loadTimetable()">Refresh List</button>
+    <table border="1" id="timetableTable">
+        <tr><th>ID</th><th>Day</th><th>Time</th><th>Classroom Number</th><th>Section</th><th>Class</th><th>Assigned Teacher</th></tr>
+    </table>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+
+        // ---------- STUDENTS ----------
+
+        function clearForm() {
+            ["roll_no","name","age","gender","section","gmail","major_subject"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+        }
+
+        async function addStudent() {
+            const params = new URLSearchParams({
+                roll_no: document.getElementById("roll_no").value,
+                name: document.getElementById("name").value,
+                age: document.getElementById("age").value,
+                gender: document.getElementById("gender").value,
+                section: document.getElementById("section").value,
+                gmail: document.getElementById("gmail").value,
+                major_subject: document.getElementById("major_subject").value
+            });
+            await fetch(`${API}/students?${params}`, { method: "POST" });
+            clearForm();
+            loadStudents();
+        }
+
+        async function searchStudent() {
+            const rollNo = document.getElementById("search_roll_no").value;
+            const res = await fetch(`${API}/students/${rollNo}`);
+            const data = await res.json();
+            document.getElementById("searchResult").innerText = JSON.stringify(data);
+        }
+
+        async function loadForEdit() {
+            const rollNo = document.getElementById("search_roll_no").value;
+            const res = await fetch(`${API}/students/${rollNo}`);
+            const s = await res.json();
+            if (!s) {
+                document.getElementById("searchResult").innerText = "Not found";
+                return;
+            }
+            document.getElementById("roll_no").value = s[0];
+            document.getElementById("name").value = s[1];
+            document.getElementById("age").value = s[2];
+            document.getElementById("gender").value = s[3];
+            document.getElementById("section").value = s[4];
+            document.getElementById("gmail").value = s[5];
+            document.getElementById("major_subject").value = s[6];
+            document.getElementById("searchResult").innerText = "Loaded - edit fields above, then click Save Changes";
+        }
+
+        async function saveChanges() {
+            const params = new URLSearchParams({
+                name: document.getElementById("name").value,
+                age: document.getElementById("age").value,
+                gender: document.getElementById("gender").value,
+                section: document.getElementById("section").value,
+                gmail: document.getElementById("gmail").value,
+                major_subject: document.getElementById("major_subject").value
+            });
+            const rollNo = document.getElementById("roll_no").value;
+            await fetch(`${API}/students/${rollNo}?${params}`, { method: "PUT" });
+            document.getElementById("searchResult").innerText = "Updated";
+            clearForm();
+            loadStudents();
+        }
+
+        async function deleteStudent() {
+            const rollNo = document.getElementById("search_roll_no").value;
+            await fetch(`${API}/students/${rollNo}`, { method: "DELETE" });
+            loadStudents();
+        }
+
+        async function loadStudents() {
+            const res = await fetch(`${API}/students`);
+            const students = await res.json();
+            const table = document.getElementById("studentTable");
+            table.innerHTML = "<tr><th>Roll No</th><th>Name</th><th>Age</th><th>Gender</th><th>Section</th><th>Gmail</th><th>Major</th></tr>";
+            students.forEach(s => {
+                table.innerHTML += `<tr>${s.map(v => `<td>${v}</td>`).join("")}</tr>`;
+            });
+        }
+
+        const fieldOrder = ["roll_no","name","age","gender","section","gmail","major_subject"];
+        fieldOrder.forEach((id, index) => {
+            document.getElementById(id).addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (index < fieldOrder.length - 1) {
+                        document.getElementById(fieldOrder[index + 1]).focus();
+                    } else {
+                        addStudent();
+                    }
+                }
+            });
+        });
+
+        loadStudents();
+
+        // ---------- TEACHERS ----------
+
+        function clearTeacherForm() {
+            ["t_id","t_name","t_gender","t_subject","t_specialization"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+        }
+
+        async function addTeacher() {
+            const params = new URLSearchParams({
+                id: document.getElementById("t_id").value,
+                name: document.getElementById("t_name").value,
+                gender: document.getElementById("t_gender").value,
+                subject: document.getElementById("t_subject").value,
+                specialization: document.getElementById("t_specialization").value
+            });
+            await fetch(`${API}/teachers?${params}`, { method: "POST" });
+            clearTeacherForm();
+            loadTeachers();
+        }
+
+        async function searchTeacher() {
+            const id = document.getElementById("search_t_id").value;
+            const res = await fetch(`${API}/teachers/${id}`);
+            const data = await res.json();
+            document.getElementById("teacherResult").innerText = JSON.stringify(data);
+        }
+
+        async function loadTeacherForEdit() {
+            const id = document.getElementById("search_t_id").value;
+            const res = await fetch(`${API}/teachers/${id}`);
+            const t = await res.json();
+            if (!t) {
+                document.getElementById("teacherResult").innerText = "Not found";
+                return;
+            }
+            document.getElementById("t_id").value = t[0];
+            document.getElementById("t_name").value = t[1];
+            document.getElementById("t_gender").value = t[2];
+            document.getElementById("t_subject").value = t[3];
+            document.getElementById("t_specialization").value = t[4];
+            document.getElementById("teacherResult").innerText = "Loaded - edit fields above, then click Save Changes";
+        }
+
+        async function saveTeacherChanges() {
+            const params = new URLSearchParams({
+                name: document.getElementById("t_name").value,
+                gender: document.getElementById("t_gender").value,
+                subject: document.getElementById("t_subject").value,
+                specialization: document.getElementById("t_specialization").value
+            });
+            const id = document.getElementById("t_id").value;
+            await fetch(`${API}/teachers/${id}?${params}`, { method: "PUT" });
+            document.getElementById("teacherResult").innerText = "Updated";
+            clearTeacherForm();
+            loadTeachers();
+        }
+
+        async function deleteTeacher() {
+            const id = document.getElementById("search_t_id").value;
+            await fetch(`${API}/teachers/${id}`, { method: "DELETE" });
+            loadTeachers();
+        }
+
+        async function loadTeachers() {
+            const res = await fetch(`${API}/teachers`);
+            const teachers = await res.json();
+            const table = document.getElementById("teacherTable");
+            table.innerHTML = "<tr><th>ID</th><th>Name</th><th>Gender</th><th>Subject</th><th>Specialization</th></tr>";
+            teachers.forEach(t => {
+                table.innerHTML += `<tr>${t.map(v => `<td>${v}</td>`).join("")}</tr>`;
+            });
+        }
+
+        const teacherFieldOrder = ["t_id","t_name","t_gender","t_subject","t_specialization"];
+        teacherFieldOrder.forEach((id, index) => {
+            document.getElementById(id).addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (index < teacherFieldOrder.length - 1) {
+                        document.getElementById(teacherFieldOrder[index + 1]).focus();
+                    } else {
+                        addTeacher();
+                    }
+                }
+            });
+        });
+
+        loadTeachers();
+
+        // ---------- CLASSROOMS ----------
+
+        function clearClassroomForm() {
+            ["c_number","c_capacity","c_department","c_section"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+        }
+
+        async function addClassroom() {
+            const params = new URLSearchParams({
+                classroom_number: document.getElementById("c_number").value,
+                capacity: document.getElementById("c_capacity").value,
+                department: document.getElementById("c_department").value,
+                section: document.getElementById("c_section").value
+            });
+            await fetch(`${API}/classrooms?${params}`, { method: "POST" });
+            clearClassroomForm();
+            loadClassrooms();
+        }
+
+        async function searchClassroom() {
+            const num = document.getElementById("search_c_number").value;
+            const res = await fetch(`${API}/classrooms/${num}`);
+            const data = await res.json();
+            document.getElementById("classroomResult").innerText = JSON.stringify(data);
+        }
+
+        async function loadClassroomForEdit() {
+            const num = document.getElementById("search_c_number").value;
+            const res = await fetch(`${API}/classrooms/${num}`);
+            const c = await res.json();
+            if (!c) {
+                document.getElementById("classroomResult").innerText = "Not found";
+                return;
+            }
+            document.getElementById("c_number").value = c[0];
+            document.getElementById("c_capacity").value = c[1];
+            document.getElementById("c_department").value = c[2];
+            document.getElementById("c_section").value = c[3];
+            document.getElementById("classroomResult").innerText = "Loaded - edit fields above, then click Save Changes";
+        }
+
+        async function saveClassroomChanges() {
+            const params = new URLSearchParams({
+                capacity: document.getElementById("c_capacity").value,
+                department: document.getElementById("c_department").value,
+                section: document.getElementById("c_section").value
+            });
+            const num = document.getElementById("c_number").value;
+            await fetch(`${API}/classrooms/${num}?${params}`, { method: "PUT" });
+            document.getElementById("classroomResult").innerText = "Updated";
+            clearClassroomForm();
+            loadClassrooms();
+        }
+
+        async function deleteClassroom() {
+            const num = document.getElementById("search_c_number").value;
+            await fetch(`${API}/classrooms/${num}`, { method: "DELETE" });
+            loadClassrooms();
+        }
+
+        async function loadClassrooms() {
+            const res = await fetch(`${API}/classrooms`);
+            const classrooms = await res.json();
+            const table = document.getElementById("classroomTable");
+            table.innerHTML = "<tr><th>Number</th><th>Capacity</th><th>Department</th><th>Section</th></tr>";
+            classrooms.forEach(c => {
+                table.innerHTML += `<tr>${c.map(v => `<td>${v}</td>`).join("")}</tr>`;
+            });
+        }
+
+        const classroomFieldOrder = ["c_number","c_capacity","c_department","c_section"];
+        classroomFieldOrder.forEach((id, index) => {
+            document.getElementById(id).addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (index < classroomFieldOrder.length - 1) {
+                        document.getElementById(classroomFieldOrder[index + 1]).focus();
+                    } else {
+                        addClassroom();
+                    }
+                }
+            });
+        });
+
+        loadClassrooms();
+
+        // ---------- TIMETABLE ----------
+
+        function clearTimetableForm() {
+            ["tt_id","tt_day","tt_time","tt_classroom","tt_section","tt_class","tt_teacher"].forEach(id => {
+                document.getElementById(id).value = "";
+            });
+        }
+
+        async function addTimetable() {
+            const params = new URLSearchParams({
+                day: document.getElementById("tt_day").value,
+                time: document.getElementById("tt_time").value,
+                classroom_number: document.getElementById("tt_classroom").value,
+                section: document.getElementById("tt_section").value,
+                assigned_class: document.getElementById("tt_class").value,
+                assigned_teacher: document.getElementById("tt_teacher").value
+            });
+            await fetch(`${API}/timetable?${params}`, { method: "POST" });
+            clearTimetableForm();
+            loadTimetable();
+        }
+
+        async function searchTimetable() {
+            const id = document.getElementById("search_tt_id").value;
+            const res = await fetch(`${API}/timetable/${id}`);
+            const data = await res.json();
+            document.getElementById("timetableResult").innerText = JSON.stringify(data);
+        }
+
+        async function loadTimetableForEdit() {
+            const id = document.getElementById("search_tt_id").value;
+            const res = await fetch(`${API}/timetable/${id}`);
+            const t = await res.json();
+            if (!t) {
+                document.getElementById("timetableResult").innerText = "Not found";
+                return;
+            }
+            document.getElementById("tt_id").value = t[0];
+            document.getElementById("tt_day").value = t[1];
+            document.getElementById("tt_time").value = t[2];
+            document.getElementById("tt_classroom").value = t[3];
+            document.getElementById("tt_section").value = t[4];
+            document.getElementById("tt_class").value = t[5];
+            document.getElementById("tt_teacher").value = t[6];
+            document.getElementById("timetableResult").innerText = "Loaded - edit fields above, then click Save Changes";
+        }
+
+        async function saveTimetableChanges() {
+            const params = new URLSearchParams({
+                day: document.getElementById("tt_day").value,
+                time: document.getElementById("tt_time").value,
+                classroom_number: document.getElementById("tt_classroom").value,
+                section: document.getElementById("tt_section").value,
+                assigned_class: document.getElementById("tt_class").value,
+                assigned_teacher: document.getElementById("tt_teacher").value
+            });
+            const id = document.getElementById("tt_id").value;
+            await fetch(`${API}/timetable/${id}?${params}`, { method: "PUT" });
+            document.getElementById("timetableResult").innerText = "Updated";
+            clearTimetableForm();
+            loadTimetable();
+        }
+
+        async function deleteTimetable() {
+            const id = document.getElementById("search_tt_id").value;
+            await fetch(`${API}/timetable/${id}`, { method: "DELETE" });
+            loadTimetable();
+        }
+
+        async function loadTimetable() {
+            const res = await fetch(`${API}/timetable`);
+            const entries = await res.json();
+            const table = document.getElementById("timetableTable");
+            table.innerHTML = "<tr><th>ID</th><th>Day</th><th>Time</th><th>Classroom Number</th><th>Section</th><th>Class</th><th>Assigned Teacher</th></tr>";
+            entries.forEach(t => {
+                table.innerHTML += `<tr>${t.map(v => `<td>${v}</td>`).join("")}</tr>`;
+            });
+        }
+
+        const timetableFieldOrder = ["tt_day","tt_time","tt_classroom","tt_section","tt_class","tt_teacher"];
+        timetableFieldOrder.forEach((id, index) => {
+            document.getElementById(id).addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (index < timetableFieldOrder.length - 1) {
+                        document.getElementById(timetableFieldOrder[index + 1]).focus();
+                    } else {
+                        addTimetable();
+                    }
+                }
+            });
+        });
+
+        loadTimetable();
+    </script>
+</body>
+</html>
